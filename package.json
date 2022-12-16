@@ -1,0 +1,14 @@
+{
+  "name": "record",
+  "version": "1.0.0",
+  "description": "Record almost any kind of IPTV with these scripts.",
+  "keywords": [],
+  "author": "AndreMor",
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {
+    "async-exit-hook": "^2.0.1",
+    "croner": "^5.3.4",
+    "execa": "^6.1.0"
+  }
+}

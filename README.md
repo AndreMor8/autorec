@@ -1,0 +1,26 @@
+# Automatic IPTV recording
+Scripts to record in a massive or automatic way almost any type of IPTV.
+
+My friends got tired of waking up every 4 or 7 AM to be able to record a program that only aired in that interval of hours. It was just stressful and left bad consequences.
+
+So I created these scripts, so that we can continue to archive TV shows without worry.
+
+`streamlink` is used for HLS streams, while for the other type of stream in the IPTV world, which is endless streaming of a video file, `wget` is used.
+
+The scripts are guaranteed to work on Linux.
+
+## Alpine
+```sh
+apk add git npm wget streamlink
+git clone https://github.com/AndreMor8/autorec
+cd autorec
+npm i
+```
+## Debian/Ubuntu
+```sh
+apt install wget python3-pip git nodejs npm
+pip install streamlink
+git clone https://github.com/AndreMor8/autorec
+cd autorec
+npm i
+```
