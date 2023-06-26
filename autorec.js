@@ -1,5 +1,6 @@
 import { execa } from 'execa';
 import Cron from 'croner';
+import terminate from 'terminate/promise.js';
 
 // Set timezone for cronjobs
 const timezone = "America/Lima";
@@ -8,16 +9,18 @@ const timezone = "America/Lima";
 const programs = [
 	// crontab for recording start
 	['0 7 * * *', {
-		url: 'm3u* or file link', // IPTV/stream link
+		url: 'm3u*/mpd or file link', // IPTV/stream link
 		name: 'any-name', // name for files
 		end: '0 8 * * *', // crontab for recording end
-		direct: false // true for endless file download, otherwise false
+		direct: false, // true for endless file download, otherwise false,
+		additional: "", //additional command line arguments
+		keys: [] //only drm streams, uses N_m3u8DL-RE
 	}]
 ];
 
 for (const program of programs) {
 	const job = Cron(program[0], { context: program[1], timezone }, record);
-	console.log(`${program[1].name} -> ${job.next()}`);
+	console.log(`${program[1].name} -> ${job.nextRun()}`);
 }
 
 console.log(`\n${programs.length} programs ready to be auto-recorded!`);
@@ -28,8 +31,9 @@ function record(job, options) {
 	let pr = write(options);
 	const endjob = Cron(options.end, { maxRuns: 1, timezone }, (ej) => {
 		pr.removeAllListeners('exit');
-		pr.cancel();
-		console.log(`\nSTOPPED RECORDING AT ${new Date().toLocaleString()}`);
+		terminate(pr.pid, "SIGTERM", { timeout: 60000 }).then(() => {
+			console.log(`\nSTOPPED RECORDING AT ${new Date().toLocaleString()}`);
+		});
 	});
 	function exit() {
 		if (retries >= options.max_retries) {
@@ -48,11 +52,15 @@ function record(job, options) {
 
 function write(options) {
 	let command;
-	if (options.direct) command = `wget -q -O '${getName(options.name, new Date())}.ts'${options.referer ? ` --referer='${options.referer}'` : ''}${options.user_agent ? ` --user-agent='${options.user_agent}'` : ''} '${options.url}'`;
-	else command = `streamlink${options.proxy ? ` --http-proxy '${options.proxy}'` : ''}${options.referer ? ` --http-header 'referer=${options.referer}'` : ''}${options.user_agent ? ` --http-header 'User-Agent=${options.user_agent}'` : ''} -o '${getName(options.name, new Date())}.ts' '${options.url}' best`;
+	if(options.keys?.length) {
+		command = `N_m3u8DL-RE ${options.url} -M mp4 -mt --no-log --check-segments-count false ${options.additional || ''} -sv best -ss all --save-name "${getName(options.name, new Date())}" --binary-merge --live-real-time-merge --live-pipe-mux --use-shaka-packager ${options.keys.map(e => "--key " + e).join(" ")}`;
+	} else {
+		if (options.direct) command = `wget -q -O '${getName(options.name, new Date())}.ts' ${options.additional || ''} '${options.url}'`;
+		else command = `streamlink ${options.additional || ''} -o '${getName(options.name, new Date())}.ts' '${options.url}' best`;	
+	}
 	console.log(`\n${new Date().toLocaleString()}`);
 	console.log(`\n${command}`);
-	return execa(command, { shell: '/bin/sh', stdout: process.stdout, stderr: process.stderr, stdin: null });
+	return execa(command, { shell: '/bin/sh', cleanup: false });
 }
 
 function getName(name, date) {

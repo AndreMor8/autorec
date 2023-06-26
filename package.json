@@ -8,7 +8,8 @@
   "type": "module",
   "dependencies": {
     "async-exit-hook": "^2.0.1",
-    "croner": "^5.3.4",
-    "execa": "^6.1.0"
+    "croner": "^6.0.5",
+    "execa": "^7.1.1",
+    "terminate": "^2.6.1"
   }
 }
