@@ -59,7 +59,7 @@ function write(options) {
 	else command = `${STREAMLINK_CMD} ${options.additional || ""} -o "${getName(options.name, new Date())}.ts" "${options.url}" best`;
 	console.log(`\n${new Date().toLocaleString()}`);
 	console.log(`\n${command}`);
-	return execa({ shell: true, cleanup: false })(command);
+	return execa({ shell: true, cleanup: false, reject: false })(command);
 }
 
 function getName(name, date) {

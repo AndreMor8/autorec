@@ -25,7 +25,7 @@ function record() {
     if (program.direct) command = `${WGET_CMD} -q -O "${getName(program.name, new Date())}.ts" ${program.additional || ""} "${program.url}"`;
     else command = `${STREAMLINK_CMD} ${program.additional || ""} -o "${getName(program.name, new Date())}.ts" "${program.url}" best`;
     console.log(`${command}\n`);
-    const pr = execa({ shell: true, cleanup: false })(command);
+    const pr = execa({ shell: true, cleanup: false, reject: false })(command);
     pr.on("exit", () => {
         console.log("\nNEXT RECORD! ;)\n");
         acp = record();
