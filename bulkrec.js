@@ -1,4 +1,4 @@
-import { execa } from "execa";
+import { execa, execaSync } from "execa";
 import cron from "croner";
 import exitHook from "async-exit-hook";
 import terminate from "terminate/promise.js";
@@ -25,6 +25,8 @@ function record() {
     if (program.direct) command = `${WGET_CMD} -q -O "${getName(program.name, new Date())}.ts" ${program.additional || ""} "${program.url}"`;
     else command = `${STREAMLINK_CMD} ${program.additional || ""} -o "${getName(program.name, new Date())}.ts" "${program.url}" best`;
     console.log(`${command}\n`);
+    //verify program exists
+    execaSync({ shell: true })(program.direct ? WGET_CMD : STREAMLINK_CMD);
     const pr = execa({ shell: true, cleanup: false, reject: false })(command);
     pr.on("exit", () => {
         console.log("\nNEXT RECORD! ;)\n");

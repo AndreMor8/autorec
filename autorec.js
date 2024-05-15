@@ -1,4 +1,4 @@
-import { execa } from "execa";
+import { execa, execaSync } from "execa";
 import Cron from "croner";
 import terminate from "terminate/promise.js";
 
@@ -10,6 +10,10 @@ const timezone = "America/Lima";
 //Default is searching them on PATH
 const WGET_CMD = "wget";
 const STREAMLINK_CMD = "streamlink";
+
+//verify these exists
+execaSync({ shell: true })(WGET_CMD);
+execaSync({ shell: true })(STREAMLINK_CMD);
 
 const programs = [];
 // Set up your programs, crontab for recording start
