@@ -12,7 +12,7 @@ const WGET_CMD = "wget";
 const STREAMLINK_CMD = "streamlink";
 
 //verify these exists
-execaSync({ shell: true })(WGET_CMD);
+execaSync({ shell: true })(`${WGET_CMD} --version`);
 execaSync({ shell: true })(STREAMLINK_CMD);
 
 const programs = [];
