@@ -26,7 +26,7 @@ function record() {
     else command = `${STREAMLINK_CMD} ${program.additional || ""} -o "${getName(program.name, new Date())}.ts" "${program.url}" best`;
     console.log(`${command}\n`);
     //verify program exists
-    execaSync({ shell: true })(program.direct ? WGET_CMD : STREAMLINK_CMD);
+    execaSync({ shell: true })(program.direct ? `${WGET_CMD} --version` : STREAMLINK_CMD);
     const pr = execa({ shell: true, cleanup: false, reject: false })(command);
     pr.on("exit", () => {
         console.log("\nNEXT RECORD! ;)\n");
